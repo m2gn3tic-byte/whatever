@@ -6,7 +6,7 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const git = (args, options={}) => execFileSync('git', args, {cwd:root, encoding:'utf8', ...options}).trim();
+const git = (args, options={}) => (execFileSync('git', args, {cwd:root, encoding:'utf8', ...options}) || '').trim();
 git(['rev-parse','--verify','HEAD']);
 const gitDir = git(['rev-parse','--absolute-git-dir']);
 const download = resolve(root,'artifacts/playtest');
