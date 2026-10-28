@@ -4,6 +4,10 @@ Arvuti veebibrauser on testimise põhiline siht. Lõplik mäng jääb Androidi t
 
 **[Arvuti prooviversiooni ZIP](https://github.com/m2gn3tic-byte/whatever/archive/refs/heads/playtest.zip)** on GitHubis olemas. Allalaadimine tagastas HTTP 200 ning arhiivi HTML-fail on testitud versiooniga bait-baidilt sama. Paki ZIP lahti ja ava **Mahub-kull.html** oma brauseris.
 
+Versioon 0.2 avaneb ka arvutis 9:16 püstvaatena. Mänguala kohandub akna kõrgusega; 1080 × 1920 võrdluspilt on [preview-v02.png](preview-v02.png). Esimeses kohvris on neli erinevat eset ning järgmised avanevad 1–2 taseme järel, kokku 18 eset. Ülaserva kohvrinupp näitab esemekogu. Hilisemate tasemete kümme eset mahuvad kahe rea peale.
+
+Uuendamisel säilivad läbitud tasemed ja avatud kohvrid. Uue paigutusega pooleliolev kohver alustab algusest. Kohaliku HTML-versiooni edenemise jaoks asenda fail samas kaustas ning kasuta sama brauserit.
+
 ## Miks varasemad lingid ei avanud mängu?
 
 Keskkonna avaldamine säilitab failid pilvemasinas. See ei avalda mängu veebilehte ega muuda `/workspace/...` failiteid allalaadimislinkideks. Arendusserver on samuti pilvemasina protsess, mis ei säili keskkonna taaskäivitamisel. Praegused tööriistad ei paku vestluses avalikku eelvaadet ega kinnitatud failimanuste edastust.

@@ -1,7 +1,7 @@
 const APP_BASE = new URL('./', self.registration.scope);
-const CACHE_NAME = `mahub-kull-v2:${APP_BASE.pathname}`;
+const CACHE_NAME = `mahub-kull-v3:${APP_BASE.pathname}`;
 const INDEX_URL = new URL('index.html', APP_BASE).href;
-const SHELL = ['', 'index.html', 'manifest.webmanifest', 'icon.svg', 'assets/items.png']
+const SHELL = ['', 'index.html', 'manifest.webmanifest', 'icon.svg', 'assets/items.png', 'assets/items-travel.png']
   .map(path => new URL(path, APP_BASE).href);
 
 async function cacheApplication() {

@@ -12,7 +12,7 @@ test('web playtest loads from its repository path and stays playable offline',as
   await page.goto('/whatever/');
   await expect(page.locator('#board')).toBeVisible();
   const href = await page.locator('.sprite image').first().getAttribute('href');
-  expect(href).toBe('/whatever/assets/items.png');
+  expect(href).toMatch(/^\/whatever\/assets\/items(?:-travel)?\.png$/);
   const icon = await page.locator('link[rel="icon"]').getAttribute('href');
   expect(icon).toBe('/whatever/icon.svg');
   const scope = await page.evaluate(async () => {
@@ -35,7 +35,7 @@ test('web playtest loads from its repository path and stays playable offline',as
     image.onerror = () => resolve(0);
     image.src = document.querySelector('.sprite image').getAttribute('href');
   }));
-  expect(art).toBe(1536);
+  expect([1536,1448]).toContain(art);
   for (let i=0;i<6 && await page.locator('.tray-piece').count();i++) await page.locator('[data-action="hint"]').click();
   await expect(page.getByRole('dialog')).toContainText('Mahubki küll!');
   await page.locator('[data-action="next"]').click();

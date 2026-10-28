@@ -43,14 +43,17 @@ test('exported HTML renders with embedded artwork and no asset requests',async (
   await expect(page.locator('link[rel="manifest"],script[src],link[rel="stylesheet"]')).toHaveCount(0);
   await expect(page.getByRole('heading',{name:/Kohver 01/})).toBeVisible();
   const loaded = await page.evaluate(async () => {
-    const source = document.querySelector('.sprite image').getAttribute('href');
-    if (!source.startsWith('data:image/png;base64,')) return false;
-    return new Promise(resolve => {
-      const image = new Image();
-      image.onload = () => resolve(image.naturalWidth === 1536 && image.naturalHeight === 1024);
-      image.onerror = () => resolve(false);
-      image.src = source;
-    });
+    const entries=Object.entries(window.__MAHUB_ASSETS__);
+    if(entries.length!==2) return false;
+    const sizes={items:[1536,1024],travel:[1448,1086]};
+    const checks=await Promise.all(entries.map(([key,source]) => new Promise(resolve => {
+      if(!source.startsWith('data:image/png;base64,')) return resolve(false);
+      const image=new Image();
+      image.onload=() => resolve(image.naturalWidth===sizes[key][0] && image.naturalHeight===sizes[key][1]);
+      image.onerror=() => resolve(false);
+      image.src=source;
+    })));
+    return checks.every(Boolean);
   });
   expect(loaded).toBe(true);
   expect(await page.locator('link[rel="icon"]').getAttribute('href')).toMatch(/^data:image\/svg\+xml;base64,/);

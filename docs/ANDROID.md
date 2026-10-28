@@ -1,6 +1,6 @@
 # Androidi prooviversiooni ehitamine
 
-See projekt kasutab Capacitor 7 veebivaadet. Veebimäng pakitakse APK sisse; mängimiseks pole vaja serverit ega internetti. Identifikaator on `ee.mahubkull.game`, versioon `0.1.0`, minimaalne Android 6 / API 23, sihtplatvorm Android 15 / API 35. Rakenduse suund on portree. Prooviversioon küsib ainult Capacitori vaikimisi internetiõigust; reklaame, oste, analüütikat ega kontosid pole.
+See projekt kasutab Capacitor 7 veebivaadet. Veebimäng pakitakse APK sisse; mängimiseks pole vaja serverit ega internetti. Identifikaator on `ee.mahubkull.game`, versioon `0.2.0`, minimaalne Android 6 / API 23, sihtplatvorm Android 15 / API 35. Rakenduse suund on portree. Prooviversioon küsib ainult Capacitori vaikimisi internetiõigust; reklaame, oste, analüütikat ega kontosid pole.
 
 ## Nõuded
 

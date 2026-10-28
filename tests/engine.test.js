@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ITEM_TYPES, LEVEL_COUNT, getLevel, getDailyLevel, rotateDimensions, validatePlacement, isComplete, getHint } from '../src/engine.js';
+import { ITEM_TYPES, LEVEL_COUNT, getLevel, getDailyLevel, getUnlockedItems, rotateDimensions, validatePlacement, isComplete, getHint } from '../src/engine.js';
 
 function applyHint(placements, hint) {
   const result = structuredClone(placements);
@@ -40,6 +40,28 @@ test('level generation is deterministic and returns independently mutable object
   first.solution = {};
   assertSolvable(getLevel(9));
   for (const index of [-1, LEVEL_COUNT, 1.1, NaN, '1']) assert.throws(() => getLevel(index), RangeError);
+});
+
+test('18 items appear at their unlock levels with a new discovery every one to three levels', () => {
+  assert.equal(Object.keys(ITEM_TYPES).length,18);
+  const seen=new Set(),introductions=[];
+  for(let index=0;index<LEVEL_COUNT;index++) {
+    const level=getLevel(index),available=getUnlockedItems(index);
+    assert.equal(level.revision,2);
+    assert.ok(level.cols>=level.rows,'portrait stage keeps suitcase square or landscape');
+    assert.ok(level.pieces.length<=10,'all pieces fit in two tray rows');
+    assert.ok(new Set(level.pieces.map(piece=>piece.type)).size>=4,'avoid a case of identical items');
+    for(const piece of level.pieces) {
+      assert.ok(available.includes(piece.type),'no item before its unlock');
+      if(!seen.has(piece.type)) assert.equal(ITEM_TYPES[piece.type].unlock,index+1);
+      seen.add(piece.type);
+    }
+    for(const type of level.newItems) assert.ok(level.pieces.some(piece=>piece.type===type),`${type} is actually playable at introduction`);
+    if(level.newItems.length) introductions.push(index+1);
+  }
+  assert.equal(seen.size,18);
+  for(let i=1;i<introductions.length;i++) assert.ok(introductions[i]-introductions[i-1]<=3);
+  assert.equal(introductions.at(-1),24);
 });
 
 test('rotation supports degrees and quarter turns; bad dimensions and angles are rejected', () => {

@@ -2,6 +2,10 @@
 
 Eestikeelne, telefonile sobiv kohvri pakkimise pusle. Paiguta ja pööra esemeid, et kõik kohvrisse mahuksid. Mäng töötab brauseris; sama veebirakendust saab Capacitoriga Androidi jaoks pakendada.
 
+Versioonis 0.2 on 18 erinevat eset, mis avanevad kampaanias iga 1–2 taseme järel. Esimeses kohvris on neli erinevat eset. Kõigil seadmetel kasutatakse 9:16 püstvaadet; 540 × 960 CSS-piksli vaade annab kahekordse pikslitihedusega 1080 × 1920 pildi. Ülaserva kohvrinupp avab esemekogu ja uute esemete avanemise järjekorra.
+
+<img src="docs/preview-v02.png" width="270" alt="Versiooni 0.2 mänguvaade 9:16 formaadis, uute reisiesemete ja esemekoguga">
+
 ## Mängu proovimine
 
 **[Laadi arvuti prooviversioon (ZIP)](https://github.com/m2gn3tic-byte/whatever/archive/refs/heads/playtest.zip)**, paki see lahti ning ava **Mahub-kull.html** Chrome'i, Edge'i või Firefoxiga. Fail sisaldab kogu mängu ja graafikat; midagi paigaldada pole vaja. GitHubi ZIP-i allalaadimine ja testitud HTML-iga kokkulangevus on kontrollitud.
@@ -30,13 +34,15 @@ npm run preview -- --host 0.0.0.0
 
 `npm test` käivitab puslemootori testid. `npm run build` loob avaldamiseks staatilised failid kataloogi `dist/`. Eelvaates kontrolli ka lohistamist, pööramist, vihjeid, taseme lõpetamist ja edenemise säilimist pärast lehe värskendamist.
 
-Brauseritestid kasutavad Playwrighti. Käsk `npm run test:e2e` käivitab ise arendusserveri pordil 5173 ning ehitab ja käivitab tootmise eelvaate pordil 4173; juba töötavaid servereid kasutatakse väljaspool CI-d uuesti. Testid kontrollivad nii hiirega kui ka puutega mängimist ning tootmisversiooni võrguühenduseta kasutamist. Selles pilvekeskkonnas kasutatakse brauserit `/usr/bin/chromium`. Mujal paigalda vajaduse korral Playwrighti Chromium käsuga `npx playwright install chromium`; seda kasutatakse automaatselt, kui süsteemset Chromiumi pole. Kohandatud brauseri tee saab määrata muutujaga `CHROMIUM_PATH`.
+Brauseritestid kasutavad Playwrighti. Käsk `npm run test:e2e` käivitab ise arendusserveri pordil 5173, tootmise eelvaate pordil 4173 ja Pagesi alamkataloogi kontrollserveri pordil 4273; juba töötavaid servereid kasutatakse väljaspool CI-d uuesti. Testid kontrollivad hiire- ja puutejuhtimist, 9:16 paigutust, esemete avanemist, vana edenemise üleviimist ning võrguühenduseta kasutamist. Arvutivaate pildikontroll salvestab faili `artifacts/mahub-portrait-1080x1920.png` ja kontrollib selle täpset pikslimõõtu; sama pildikontrolli telefoniprojektis ei korrata. Selles pilvekeskkonnas kasutatakse brauserit `/usr/bin/chromium`. Mujal paigalda vajaduse korral Playwrighti Chromium käsuga `npx playwright install chromium`; seda kasutatakse automaatselt, kui süsteemset Chromiumi pole. Kohandatud brauseri tee saab määrata muutujaga `CHROMIUM_PATH`.
 
 ## Mängimine ja andmed
 
 Vali ese ja paiguta see kohvrisse. Lohistamine töötab hiire ja puuteekraaniga; pööramisnupp muudab valitud eseme suunda. Vihjenupp aitab paigutusega. Esemed peavad jääma kohvri sisse ega tohi kattuda.
 
 Edenemine ja eelistused säilivad selle seadme brauseri kohalikus salvestusruumis. Brauseri andmete kustutamine eemaldab ka kohaliku edenemise. Selles versioonis puuduvad kasutajakontod ja pilvesünkroonimine.
+
+Uuendamisel säilivad läbitud tasemed ja avatud kohvrid. Muutunud paigutusega pooleliolev kohver alustab uute esemetega algusest. Ühe HTML-faili puhul kasuta edenemise säilitamiseks sama brauserit ja failiasukohta.
 
 ## Võrguühenduseta kasutamine
 

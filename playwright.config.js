@@ -6,7 +6,7 @@ const chromiumPath = process.env.CHROMIUM_PATH
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ['**/e2e.spec.js', '**/offline.spec.js', '**/standalone.spec.js', '**/hosting.spec.js'],
+  testMatch: ['**/e2e.spec.js', '**/offline.spec.js', '**/standalone.spec.js', '**/hosting.spec.js', '**/portrait.spec.js'],
   fullyParallel: false,
   workers: 1,
   timeout: 30_000,

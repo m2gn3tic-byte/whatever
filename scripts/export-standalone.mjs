@@ -3,6 +3,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, extname, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SPRITE_SHEETS } from '../src/art.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
@@ -71,7 +72,8 @@ for (const match of modules) {
   if (!js.includes('data-standalone') || !js.includes('__MAHUB_ASSETS__')) throw new Error('Rebuild current code: standalone guards are required.');
   html = html.replace(match[0],() => `<script type="module">${scriptSafe(js)}</script>`);
 }
-const assets = {items:await dataUri('/assets/items.png')};
+const assets = Object.fromEntries(await Promise.all(Object.values(SPRITE_SHEETS).map(async sheet =>
+  [sheet.key,await dataUri(`/assets/${sheet.file}`)])));
 html = html.replace(/<script type="module">/i,tag => `<script>window.__MAHUB_ASSETS__=${scriptSafe(JSON.stringify(assets))};</script>\n${tag}`);
 if (/<(?:script|link)\b[^>]*\b(?:src|href)\s*=\s*["']\//i.test(html)) throw new Error('Unresolved application resource remains.');
 await mkdir(dirname(output),{recursive:true});

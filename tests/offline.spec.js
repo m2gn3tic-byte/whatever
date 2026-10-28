@@ -15,10 +15,12 @@ test('production game loads and keeps progress offline after its first visit', a
   });
   const cached = await page.evaluate(async () => {
     const registration = await navigator.serviceWorker.ready;
-    const cache = await caches.open(`mahub-kull-v2:${new URL(registration.scope).pathname}`);
+    const name=(await caches.keys()).find(key => key.startsWith('mahub-kull-v') && key.endsWith(`:${new URL(registration.scope).pathname}`));
+    const cache = await caches.open(name);
     return (await cache.keys()).map(request => new URL(request.url).pathname);
   });
   expect(cached).toContain('/assets/items.png');
+  expect(cached).toContain('/assets/items-travel.png');
   expect(cached.some(path => /\/assets\/index-.*\.js$/.test(path))).toBe(true);
   expect(cached.some(path => /\/assets\/index-.*\.css$/.test(path))).toBe(true);
   await page.locator('[data-action="hint"]').click();

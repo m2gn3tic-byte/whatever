@@ -1,8 +1,23 @@
 import './style.css';
-import { ITEM_TYPES, LEVEL_COUNT, getLevel, getDailyLevel, validatePlacement, rotateDimensions, isComplete, getHint } from './engine.js';
+import './portrait.css';
+import { ITEM_TYPES, LEVEL_COUNT, getLevel, getDailyLevel, getUnlockedItems, validatePlacement, rotateDimensions, isComplete, getHint } from './engine.js';
+import { SPRITE_SHEETS } from './art.js';
 
 const BASE = import.meta.env.BASE_URL;
-const ITEM_IMAGE = globalThis.__MAHUB_ASSETS__?.items || `${BASE}assets/items.png`;
+function sheetSource(sheet) {
+  const embedded=globalThis.__MAHUB_ASSETS__?.[sheet.key];
+  if (!embedded) return `${BASE}assets/${sheet.file}`;
+  // Reuse a short blob URL instead of copying megabytes of base64 into every
+  // SVG whenever the portable game's tray or collection is rendered again.
+  if (embedded.startsWith('data:image/png;base64,')) {
+    const binary=atob(embedded.slice(22)),bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+    return URL.createObjectURL(new Blob([bytes],{type:'image/png'}));
+  }
+  return embedded;
+}
+const SHEET_URLS = Object.fromEntries(Object.entries(SPRITE_SHEETS).map(([name,sheet]) =>
+  [name,sheetSource(sheet)]));
 const icons = {
   suitcase: '<rect x="4" y="7" width="16" height="13" rx="3"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M8 11v5m8-5v5"/>',
   rotate: '<path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/>',
@@ -38,7 +53,7 @@ let drag = null, suppressClick = false, toastTimer, audio, storageWarning = fals
 const app = document.querySelector('#app');
 const today = () => new Intl.DateTimeFormat('sv-SE', {timeZone:'Europe/Tallinn'}).format(new Date());
 function persist() {
-  progress.games[level.id] = { placements, moves, hints };
+  progress.games[level.id] = { placements, moves, hints, revision:level.revision };
   try { localStorage.setItem(STORAGE, JSON.stringify(progress)); }
   catch { if (!storageWarning) { storageWarning = true; toast('Salvestusruum pole saadaval. Edenemine säilib selle mängukorra lõpuni.'); } }
 }
@@ -57,17 +72,30 @@ function play(kind = 'place') {
   } catch { /* Sound is optional on browsers without Web Audio. */ }
 }
 const sprite = type => {
-  const positions = {shirt:[0,0],book:[1,0],shoes:[2,0],dryer:[0,1],console:[1,1],teddy:[2,1]};
-  const [x,y] = positions[type];
-  return `<svg class="sprite" viewBox="0 0 512 512" aria-hidden="true"><svg width="512" height="512" viewBox="${x*512} ${y*512} 512 512" overflow="hidden"><image href="${ITEM_IMAGE}" width="1536" height="1024"/></svg></svg>`;
+  const item=ITEM_TYPES[type],sheet=SPRITE_SHEETS[item.sheet];
+  const w=sheet.width/sheet.cols,h=sheet.height/sheet.rows;
+  return `<svg class="sprite" viewBox="0 0 ${w} ${h}" aria-hidden="true"><svg width="${w}" height="${h}" viewBox="${item.col*w} ${item.row*h} ${w} ${h}" overflow="hidden"><image href="${SHEET_URLS[item.sheet]}" width="${sheet.width}" height="${sheet.height}"/></svg></svg>`;
 };
+function reachedLevel() { return Math.min(LEVEL_COUNT-1,Math.max(progress.current,Math.max(-1,...progress.completed)+1)); }
+function discoveryBanner() {
+  if (dailyMode) return `<div class="discovery-banner"><span class="discovery-icon">${icon('star')}</span><span><strong>Päeva väike seiklus</strong><small>Kõik reisikaaslased võivad kaasa tulla</small></span><button class="icon-button" data-action="collection" aria-label="Vaata esemekogu">${icon('suitcase')}</button></div>`;
+  const fresh=level.newItems;
+  const ordered=Object.entries(ITEM_TYPES).filter(([,item]) => item.unlock>level.index+1).sort((a,b) => a[1].unlock-b[1].unlock);
+  const upcoming=ordered[0];
+  if (fresh.length) {
+    const type=fresh.length>1 ? 'camera' : fresh[0];
+    return `<div class="discovery-banner is-new"><span class="discovery-art">${sprite(type)}</span><span><strong>${fresh.length>1 ? 'Neli reisikaaslast, esimene kohver' : `Uus ese: ${esc(ITEM_TYPES[type].name)}`}</strong><small>${fresh.length>1 ? 'Avasta reisi jooksul 18 erinevat eset' : 'Uus kuju, uued pakkimisvõimalused'}</small></span><span class="new-pill">UUS</span></div>`;
+  }
+  return `<div class="discovery-banner"><span class="discovery-icon">${icon('suitcase')}</span><span><strong>${upcoming ? `Järgmisena: ${esc(upcoming[1].name)}` : 'Kõik reisikaaslased on avastatud'}</strong><small>${upcoming ? `Avaneb kohvris ${upcoming[1].unlock}` : 'Nüüd oled tõeline kohvrimeister'}</small></span><button class="icon-button" data-action="collection" aria-label="Vaata esemekogu">${icon('arrow')}</button></div>`;
+}
 function theme() { return ['Suvepuhkus', 'Nädalalõpureis', 'Väike seiklus'][Math.floor((level.index || 0) / 8)] || 'Suvepuhkus'; }
 function loadLevel(index = progress.current, daily = false) {
   dailyMode = daily;
   level = daily ? getDailyLevel(today()) : getLevel(index);
   if (!daily) progress.current = index;
   placements = {}; rotations = {}; history = []; selected = null;
-  const previous = progress.games[level.id];
+  const stored = progress.games[level.id];
+  const previous = stored?.revision===level.revision ? stored : null;
   if (previous?.placements && typeof previous.placements === 'object') {
     for (const piece of level.pieces) {
       const p = previous.placements[piece.id];
@@ -82,7 +110,7 @@ function render() {
   app.innerHTML = `
     <header class="site-header">
       <button class="brand" data-action="journey" aria-label="Mahub küll! avaleht"><span class="brand-icon">${icon('suitcase')}</span><span>mahub küll<span class="brand-dot">!</span></span></button>
-      <div class="header-right"><span class="offline-note"><i></i> Väike paus, ainult sulle</span><button class="icon-button" data-action="sound" aria-label="${progress.sound ? 'Lülita heli välja' : 'Lülita heli sisse'}">${icon(progress.sound ? 'sound' : 'mute')}</button><button class="icon-button" data-action="help" aria-label="Kuidas mängida">${icon('help')}</button></div>
+      <div class="header-right"><button class="icon-button collection-button" data-action="collection" aria-label="Esemekogu">${icon('suitcase')}</button><button class="icon-button" data-action="sound" aria-label="${progress.sound ? 'Lülita heli välja' : 'Lülita heli sisse'}">${icon(progress.sound ? 'sound' : 'mute')}</button><button class="icon-button" data-action="help" aria-label="Kuidas mängida">${icon('help')}</button></div>
     </header>
     <main class="layout">
       <aside class="journey">
@@ -98,6 +126,7 @@ function render() {
       </aside>
       <section class="game" aria-label="Kohvri pakkimise mäng">
         <div class="game-heading"><div><div class="eyebrow">${dailyMode ? 'IGALE PÄEVALE OMA SEIKLUS' : `REIS ${String(Math.floor(level.index / 8) + 1).padStart(2, '0')} · ${theme().toUpperCase()}`}</div><h2>${dailyMode ? 'Päeva kohver' : `Kohver ${String(level.index + 1).padStart(2,'0')}`}<span class="level-tag">${dailyMode ? new Intl.DateTimeFormat('et', {day:'numeric',month:'long'}).format(new Date()) : level.index < 4 ? 'MÕNUS ALGUS' : level.index < 12 ? 'VÄIKE VÄLJAKUTSE' : 'PÄRIS PAKKIJA'}</span></h2></div><button class="icon-button level-button" data-action="levels" aria-label="Vali tase">${icon('grid')}</button></div>
+        ${discoveryBanner()}
         <div class="packing-status"><span id="packing-label" role="status"></span><span id="packing-count"></span></div>
         <div class="progress-track"><span id="packing-progress"></span></div>
         <div class="suitcase-wrap"><div class="case-handle top"></div><div class="suitcase"><div class="case-corner c1"></div><div class="case-corner c2"></div><div class="case-corner c3"></div><div class="case-corner c4"></div><div class="zipper"><div class="board" id="board" style="--cols:${level.cols};--rows:${level.rows};aspect-ratio:${level.cols}/${level.rows}" aria-label="${level.cols} korda ${level.rows} pakkimislaud"></div></div><span class="case-clasp clasp-left"></span><span class="case-clasp clasp-right"></span></div><div class="case-handle bottom"></div><div class="case-sticker">${icon('sun')} <span>GOOD<br>THINGS<br>AHEAD</span></div></div>
@@ -108,7 +137,7 @@ function render() {
       </section>
       <aside class="side-note" aria-hidden="true"><span class="postcard-stamp">ET<br>✳</span><span class="postcard-sun"></span><div class="postcard-hills"></div><span class="postcard-text">väikesed<br><em>head hetked.</em></span></aside>
     </main>
-    <footer class="site-footer"><span>TEHTUD VÄIKESTEKS PUHKEHETKEDEKS</span><span>Esimene reis · v0.1</span></footer>
+    <footer class="site-footer"><span>VÄIKE KOHVER. SUURED PLAANID.</span><span>18 reisikaaslast · v0.2</span></footer>
     <div class="toast" id="toast" role="status" aria-live="polite"></div><dialog id="modal" aria-label="Mängu teave"></dialog>`;
   renderPieces();
 }
@@ -127,7 +156,8 @@ function renderPieces() {
   board.innerHTML = Array.from({ length:level.cols * level.rows }, (_,i) => `<button class="cell" data-cell="${i}" aria-label="Rida ${Math.floor(i / level.cols) + 1}, veerg ${i % level.cols + 1}"></button>`).join('') + level.pieces.filter(p => placements[p.id]).map(p => pieceButton(p, placements[p.id])).join('');
   const remaining = level.pieces.filter(p => !placements[p.id]);
   document.querySelector('#tray').innerHTML = remaining.length ? remaining.map(p => pieceButton(p)).join('') : `<button class="all-packed" data-action="show-win">${icon('check')} Kõik on kaasas. Jätka reisi ${icon('arrow')}</button>`;
-  document.querySelector('#tray').style.setProperty('--items', Math.min(remaining.length, 4));
+  document.querySelector('#tray').style.setProperty('--items', Math.min(remaining.length, 5));
+  document.querySelector('#tray').style.setProperty('--tray-rows', Math.max(1,Math.ceil(remaining.length/5)));
   document.querySelector('#tray-label').textContent = remaining.length ? `VEEL ${remaining.length} ${remaining.length === 1 ? 'ESE' : 'ESET'} KAASA` : 'KOHVER ON PAKITUD';
   document.querySelector('#packing-label').textContent = remaining.length ? 'Igale asjale oma koht' : 'Valmis uuteks seiklusteks';
   document.querySelector('#packing-count').textContent = `${level.pieces.length - remaining.length} / ${level.pieces.length} pakitud`;
@@ -211,6 +241,14 @@ function showLevels() {
   const unlocked = Math.min(LEVEL_COUNT - 1, Math.max(-1, ...progress.completed) + 1);
   openModal(`<div class="eyebrow">IGA KOHVER ON UUS ALGUS</div><h2>Sinu väike reis</h2><p>${progress.completed.length} kohvrit pakitud. Võta järgmine ette.</p><div class="level-grid">${Array.from({length:LEVEL_COUNT},(_,i) => `<button data-level="${i}" class="level-tile ${progress.completed.includes(i) ? 'done' : ''} ${!dailyMode && i === level.index ? 'current' : ''}" ${i > unlocked ? 'disabled' : ''} aria-label="Kohver ${i+1}${i > unlocked ? ', lukus' : ''}">${progress.completed.includes(i) ? icon('check') : String(i+1).padStart(2,'0')}</button>`).join('')}</div><div class="modal-footnote">Uus kohver avaneb eelmise lõpetamisel.</div><button class="daily-entry" data-action="daily">${icon('star')}<span>Päeva kohver<small>Uus pusle iga päev</small></span>${icon('arrow')}</button>${dailyMode ? '<button class="text-button" data-action="journey">Tagasi oma reisile</button>' : ''}`);
 }
+function showCollection() {
+  const unlocked=getUnlockedItems(reachedLevel());
+  const types=Object.keys(ITEM_TYPES).sort((a,b) => ITEM_TYPES[a].unlock-ITEM_TYPES[b].unlock);
+  openModal(`<div class="eyebrow">IGAL REISIL MIDAGI UUT</div><h2>Sinu reisikaaslased</h2><p>${unlocked.length} / ${types.length} eset avastatud. Uus ese avaneb iga paari kohvri järel.</p><div class="collection-grid">${types.map(type => {
+    const item=ITEM_TYPES[type],open=unlocked.includes(type);
+    return `<div class="collection-item ${open ? 'discovered' : 'locked'}" data-collection-item="${type}" data-unlocked="${open}"><span class="collection-art">${open ? sprite(type) : '<span class="unknown-item">?</span>'}</span><strong>${esc(item.name)}</strong><small>${open ? `${item.w} × ${item.h} ruutu` : `Kohver ${item.unlock}`}</small></div>`;
+  }).join('')}</div><button class="primary-button" data-action="close">Tagasi pakkima ${icon('arrow')}</button>`,'collection-modal');
+}
 function help() {
   openModal(`<div class="help-illustration">${icon('suitcase')}</div><div class="eyebrow">VÄIKE PAKKIMISÕPETUS</div><h2>Kõik leiab oma koha.</h2><div class="help-steps"><div><b>01</b><span><strong>Vali ja lohista</strong>Võta alt ese ning lohista see kohvrisse. Võid ka valida eseme ja puudutada ruutu.</span></div><div><b>02</b><span><strong>Keera teistpidi</strong>Vali ese ja vajuta „Pööra”. Klaviatuuril töötab ka R. Mõnikord piisab vaid ühest pöördest.</span></div><div><b>03</b><span><strong>Paki kõik kaasa</strong>Esemed ei tohi kattuda. Vihje aitab ning tagasinool võtab käigu tagasi. Ajalimiiti pole.</span></div></div><button class="primary-button" data-action="close">Proovime järele ${icon('arrow')}</button>`);
 }
@@ -236,6 +274,7 @@ app.addEventListener('click', event => {
       case 'sound': { const button = event.target.closest('button'); progress.sound = !progress.sound; persist(); button.innerHTML = icon(progress.sound ? 'sound' : 'mute'); button.setAttribute('aria-label', progress.sound ? 'Lülita heli välja' : 'Lülita heli sisse'); play(); break; }
       case 'help': help(); break;
       case 'levels': showLevels(); break;
+      case 'collection': showCollection(); break;
       case 'close': closeModal(); break;
       case 'next': closeModal(); loadLevel(Math.min(level.index+1,LEVEL_COUNT-1)); break;
       case 'show-win': showWin(); break;
