@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#22585b"/>
+      <stop offset="1" stop-color="#113b40"/>
+    </linearGradient>
+    <linearGradient id="case" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#edb579"/>
+      <stop offset="1" stop-color="#c78850"/>
+    </linearGradient>
+    <linearGradient id="lining" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#397473"/>
+      <stop offset="1" stop-color="#235455"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <ellipse cx="256" cy="390" rx="153" ry="22" fill="#082a30" opacity=".28"/>
+  <rect x="219" y="105" width="74" height="35" rx="13" fill="none" stroke="#d99c63" stroke-width="17"/>
+  <rect x="101" y="135" width="310" height="254" rx="45" fill="url(#case)"/>
+  <rect x="116" y="150" width="280" height="224" rx="34" fill="none" stroke="#f5cf99" stroke-width="3" stroke-dasharray="3 6"/>
+  <rect x="130" y="164" width="252" height="196" rx="24" fill="url(#lining)"/>
+  <path d="M214 164v196M298 164v196M130 229h252M130 294h252" fill="none" stroke="#a7c4b1" stroke-opacity=".17" stroke-width="2"/>
+  <rect x="144" y="178" width="140" height="101" rx="12" fill="#ec8c76"/>
+  <path d="M181 178q33 35 66 0" fill="none" stroke="#c86e5f" stroke-width="9"/>
+  <path d="M146 238h136" stroke="#ffe2bc" stroke-width="12"/>
+  <rect x="300" y="178" width="67" height="166" rx="10" fill="#9fbca3"/>
+  <rect x="306" y="178" width="5" height="166" rx="2" fill="#749780"/>
+  <path d="M329 316v-95m0 52q-18-3-15-22 17 0 15 22m0-29q22-3 20-23-19 1-20 23m0 56q22-3 20-23-19 1-20 23" fill="#477b64" stroke="#477b64" stroke-width="3" stroke-linecap="round"/>
+  <rect x="144" y="294" width="140" height="50" rx="12" fill="#eed38a"/>
+  <path d="m187 316 14 13 28-26" fill="none" stroke="#6f7755" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="221" y="375" width="70" height="21" rx="8" fill="#674d37"/>
+  <path d="m384 101 5 16 17 5-17 5-5 17-5-17-16-5 16-5z" fill="#f8de9f"/>
+</svg>

@@ -1,0 +1,11 @@
+{
+  "appId": "ee.mahubkull.game",
+  "appName": "Mahub küll!",
+  "webDir": "dist",
+  "android": {
+    "adjustMarginsForEdgeToEdge": "auto"
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

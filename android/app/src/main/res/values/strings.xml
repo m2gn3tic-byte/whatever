@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mahub küll!</string>
+    <string name="title_activity_main">Mahub küll!</string>
+    <string name="package_name">ee.mahubkull.game</string>
+    <string name="custom_url_scheme">ee.mahubkull.game</string>
+</resources>

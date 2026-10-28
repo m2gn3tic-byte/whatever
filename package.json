@@ -1,0 +1,28 @@
+{
+  "name": "mahub-kull",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "build:standalone": "npm run build && node scripts/export-standalone.mjs",
+    "build:pages": "npm run build:standalone && vite build --base /whatever/ --outDir dist-pages",
+    "preview:pages": "node scripts/serve-pages.mjs",
+    "publish:playtest": "npm run build:pages && node scripts/publish-playtest.mjs",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test --test-isolation=none tests/*.test.js",
+    "test:e2e": "playwright test",
+    "android:sync": "npm run build && cap sync android",
+    "android:build": "bash scripts/build-android.sh"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/android": "^7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "@playwright/test": "^1.56.1",
+    "vite": "^6.4.1"
+  }
+}
