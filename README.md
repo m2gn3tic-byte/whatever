@@ -4,7 +4,11 @@ Eestikeelne, telefonile sobiv kohvri pakkimise pusle. Paiguta ja pööra esemeid
 
 ## Mängu proovimine
 
-Arvutis testimiseks on olemas ühe failina pakitav brauseriversioon ja GitHub Pagesi jaoks ettevalmistatud veebiversioon. Käivita `npm run build:standalone` (tulemus `artifacts/Mahub-kull.html`) või `npm run build:pages` (tulemus `dist-pages/`). Avalik veebileht pole veel avaldatud ning pilvemasina failitee ei ole allalaadimislink. Täpsed avamis- ja avaldamissammud on [testimise juhendis](docs/TESTIMINE.md).
+**[Laadi arvuti prooviversioon (ZIP)](https://github.com/m2gn3tic-byte/whatever/archive/refs/heads/playtest.zip)**, paki see lahti ning ava **Mahub-kull.html** Chrome'i, Edge'i või Firefoxiga. Fail sisaldab kogu mängu ja graafikat; midagi paigaldada pole vaja. GitHubi ZIP-i allalaadimine ja testitud HTML-iga kokkulangevus on kontrollitud.
+
+Otse veebiaadressil mängimiseks on valmis haru `gh-pages`. Selle aktiveerimiseks vali [GitHub Pagesi seadetes](https://github.com/m2gn3tic-byte/whatever/settings/pages) **Deploy from a branch → gh-pages → /(root) → Save**. Keskkonna avaldamine seda seadistust ei tee. Praegune pilve võrguühendus blokeerib GitHubi haldus-API ja Pagesi hosti, mistõttu pole otse mängitavat aadressi siit kinnitatud.
+
+Kordusehituseks kasuta `npm run build:standalone` (tulemus `artifacts/Mahub-kull.html`) või `npm run build:pages` (tulemus `dist-pages/`). Loaga käivitatud `npm run publish:playtest` uuendab mõlemad testiharud GitHubis. Täpsed avamis- ja avaldamissammud on [testimise juhendis](docs/TESTIMINE.md).
 
 ## Arendamine
 

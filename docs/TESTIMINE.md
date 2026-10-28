@@ -2,6 +2,8 @@
 
 Arvuti veebibrauser on testimise põhiline siht. Lõplik mäng jääb Androidi telefonidele mõeldud rakenduseks; mõlemad kasutavad sama mänguloogikat ja graafikat.
 
+**[Arvuti prooviversiooni ZIP](https://github.com/m2gn3tic-byte/whatever/archive/refs/heads/playtest.zip)** on GitHubis olemas. Allalaadimine tagastas HTTP 200 ning arhiivi HTML-fail on testitud versiooniga bait-baidilt sama. Paki ZIP lahti ja ava **Mahub-kull.html** oma brauseris.
+
 ## Miks varasemad lingid ei avanud mängu?
 
 Keskkonna avaldamine säilitab failid pilvemasinas. See ei avalda mängu veebilehte ega muuda `/workspace/...` failiteid allalaadimislinkideks. Arendusserver on samuti pilvemasina protsess, mis ei säili keskkonna taaskäivitamisel. Praegused tööriistad ei paku vestluses avalikku eelvaadet ega kinnitatud failimanuste edastust.
