@@ -1,0 +1,8 @@
+Mahub küll! — arvuti prooviversioon
+
+1. Paki ZIP lahti.
+2. Ava Mahub-kull.html Chrome’i, Edge’i või Firefoxiga.
+
+Mäng ei vaja paigaldust ega internetti. Lohista esemeid kohvrisse.
+Vali ese ja pööra seda nupu või R-klahviga. Vihje aitab edasi.
+Edenemine salvestub brauserisse; kohalike failide salvestusreeglid sõltuvad brauserist.
