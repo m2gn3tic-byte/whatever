@@ -1,0 +1,22 @@
+{
+  "id": "./",
+  "name": "Mahub küll!",
+  "short_name": "Mahub küll!",
+  "description": "Mõnus kohvri pakkimise pusle. Leia igale asjale oma koht.",
+  "lang": "et",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f6f1e7",
+  "theme_color": "#123e43",
+  "categories": ["games", "puzzle"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
